@@ -24,6 +24,7 @@ import weka.core.TechnicalInformation;
 import weka.core.TechnicalInformation.Field;
 import weka.core.TechnicalInformation.Type;
 import weka.core.TechnicalInformationHandler;
+import weka.core.Utils;
 
 /**
  * <!-- globalinfo-start --> Class implementing minimal cost-complexity pruning.<br/>
@@ -231,11 +232,42 @@ public class SimpleCart extends RandomizableClassifier implements AdditionalMeas
 		}
 	}
 
-	private double calcuAttriGiniGainNominal() {
-
+	private double calcuAttriGiniGainNominal(Instances data, Attribute att) {
+		int numAttriValues = att.numValues();
+		int classNum = data.numClasses();
+		// 特征取值_左右分支_class分布
+		int[][][] attriV_branch_class = new int[numAttriValues][2][classNum];
 	}
 
-	private double calcuAttriGiniGainNumeric() {
+	/**
+	 * 对样本按照att特征的取值从小到大排序
+	 **/
+	private int[] sortInstanceByNumericAttriVal(Instances data, Attribute att) {
+		// 存放每个样本的当前特征att的取值
+		double[] attriInsValue = new double[data.numInstances()];
+		for(int i = 0; i < data.numInstances(); i++) {
+			double attriValue = data.instance(i).value(att);
+			attriInsValue[i] = attriValue;
+		}
+		int[] sortedInstanceId = Utils.sort(attriInsValue);
+		return sortedInstanceId;
+	}
+
+	private double calcuAttriGiniGainNumeric(Instances data, Attribute att) {
+		int classNum = data.numClasses();
+		// 排序的原因是为了方便计算每个特征值的class数量分布
+		int[] sortedInstanceId = sortInstanceByNumericAttriVal(data, att);
+		// 当前分裂点
+		double currAttValue = data.instance(0).value(att);
+		// int[当前分裂点左右枝][class的数量分布]
+		int[][] currBranchInfo = new int[2][data.numClasses()];
+		for(int i = 0; i < data.numInstances(); i++) {
+			currBranchInfo[1][(int)data.instance(i).classValue()]++;
+		}
+		// 记录最优分裂点
+		double bestSplitValue = currAttValue;
+		// 记录最优分裂点的信息int[当前分裂点左右枝][class的分布数量]
+		int[][] bestBranchInfo = new int[2][data.numClasses()];
 
 	}
 
